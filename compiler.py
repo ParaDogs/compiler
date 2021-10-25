@@ -11,9 +11,9 @@ if __name__=='__main__':
 
     flags = argparser.parse_args()
     # BEGIN DEBUG
-    flags.lexemes   = False
-    flags.tree      = True
-    flags.file      = "tests\deep.txt"
+    flags.lexemes   = True
+    flags.tree      = False
+    flags.file      = "tests\id.txt"
     # END DEBUG
     if flags.file is not None:
         lex = Lexer(flags.file, debug=True)

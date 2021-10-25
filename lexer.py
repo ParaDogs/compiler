@@ -109,6 +109,9 @@ class Lexer:
         sys.exit(1)
 
     def get_next_char(self):
+        if self.current_char == '\n':
+            self.row += 1
+            self.col = 0
         self.current_char = self.file.read(1)
         self.col += 1
 
@@ -121,7 +124,7 @@ class Lexer:
 
             # end of file
             if len(self.current_char) == 0:
-                row, col = self.row, self.col
+                # row, col = self.row, self.col
                 self.state = Lexer.EOF
             # comment
             elif self.current_char == '#':
@@ -130,7 +133,7 @@ class Lexer:
             # whitespaces and tabulation
             elif self.current_char == ' ':
                 tabulation = ""
-                row,col = self.row,self.col
+                # row,col = self.row,self.col
                 while self.current_char == ' ':
                     tabulation += self.current_char
                     self.get_next_char()
@@ -143,7 +146,7 @@ class Lexer:
                         self.error(f'Incorrect indent in position {row,col}')
             # string quote1
             elif self.current_char == "'":
-                row,col = self.row,self.col
+                # row,col = self.row,self.col
                 self.state = Lexer.STRING
                 self.value = ""
                 self.get_next_char()
@@ -153,7 +156,7 @@ class Lexer:
                 self.get_next_char()
             # string quote2
             elif self.current_char == '"':
-                row,col = self.row,self.col
+                # row,col = self.row,self.col
                 self.state = Lexer.STRING
                 self.value = ""
                 self.get_next_char()
@@ -163,20 +166,22 @@ class Lexer:
                 self.get_next_char()
             # symbols
             elif self.current_char in Lexer.SYMBOLS:
-                row,col = self.row,self.col
-                if self.current_char == '\n':
-                    self.row += 1
-                    self.col = 0              
+                # row,col = self.row,self.col
+                # if self.current_char == '\n':
+                #     self.row += 1
+                #     self.col = 0              
                 self.state = Lexer.SYMBOLS[self.current_char]
                 self.value = self.current_char #?
                 self.get_next_char() #?
             # numbers float and integer
             elif self.current_char.isdigit():
-                row,col = self.row,self.col
+                # row,col = self.row,self.col
                 number = 0
                 while self.current_char.isdigit():
                     number = number*10 + int(self.current_char)
                     self.get_next_char()
+                if self.current_char.isalpha() or self.current_char == "_":
+                    self.error(f'Invalid identifier in position {self.row,self.col}')
                 if self.current_char == '.':
                     number = str(number)
                     number += '.'
@@ -190,7 +195,7 @@ class Lexer:
                 self.value = str(number)
             # identifiers, keywords and reserved names
             elif self.current_char.isalpha() or self.current_char == '_':
-                row,col = self.row,self.col
+                # row,col = self.row,self.col
                 identifier = ""
                 while self.current_char.isalpha() or self.current_char.isdigit() or self.current_char == '_':
                     identifier += self.current_char
@@ -207,6 +212,6 @@ class Lexer:
             else:
                 self.error(f'Unexpected symbol: {self.current_char} in position {self.row,self.col}')
         # return {"state" : self.state, "value" : self.value}
-        lexem = Lexem(row, col, self.state, self.value)
+        lexem = Lexem(self.row, self.col, self.state, self.value)
         if self.debug: print(lexem)
         return lexem
