@@ -13,7 +13,7 @@ if __name__=='__main__':
     # BEGIN DEBUG
     flags.lexemes   = False
     flags.tree      = True
-    flags.file      = "tests/list.txt"
+    flags.file      = "tests/def.test"
     # END DEBUG
     if flags.file is not None:
         lex = Lexer(flags.file, debug=True)
