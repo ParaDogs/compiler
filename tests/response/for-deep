@@ -1,0 +1,10 @@
+for i in a:
+    for j in b:
+        c = a
+        c = c + 1
+
+for k in anal:
+    for i in a:
+        for j in b:
+            c = a
+            c = c + 1

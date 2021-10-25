@@ -24,7 +24,7 @@ class Node:
             
 class Parser:
     # patterns
-    PROGRAM, ZEROBLOCK, LIST, STATEMENT, MODIFICATION, FORMULA, VARIABLE, FORMALPARAMETERS, FACTPARAMETERS,\
+    PROGRAM, ZEROBLOCK, LIST, STATEMENT, MODIFICATION, FORMULA, IDENTIFIER, FORMALPARAMETERS, FACTPARAMETERS,\
     ADD, SUB, SET, LESS, GREATER, MUL, DIV, REM,\
     IFCONSTRUCTION, ELIFCONSTRUCTION, ELSECONSTRUCTION, WHILECONSTRUCTION, FORCONSTRUCTION, DEFCONSTRUCTION, BLOCK,\
     INTNUMBER, FLOATNUMBER, STRING, RETURN = range(28)
@@ -36,7 +36,7 @@ class Parser:
         STATEMENT           : "STATEMENT",
         MODIFICATION        : "MODIFICATION",
         FORMULA             : "FORMULA",
-        VARIABLE            : "VARIABLE",
+        IDENTIFIER          : "IDENTIFIER",
         FORMALPARAMETERS    : "FORMALPARAMETERS",
         FACTPARAMETERS      : "FACTPARAMETERS",
         ADD                 : "ADD",
@@ -60,7 +60,7 @@ class Parser:
         RETURN              : "RETURN",
     }
 
-    def __init__(self, lex=Lexer()):
+    def __init__(self, lex):
         self.lex = lex
     
     def error(self, message):
@@ -86,7 +86,7 @@ class Parser:
                 self.lex.get_next_token()
                 return node
             case Lexer.IDENTIFIER:
-                node = Node(Parser.VARIABLE, self.lex.value)
+                node = Node(Parser.IDENTIFIER, self.lex.value)
                 self.lex.get_next_token()
                 return node
             case Lexer.INTNUMBER:
@@ -117,7 +117,7 @@ class Parser:
             case Lexer.PLUS:
                 self.lex.get_next_token()
                 return Node(Parser.ADD, childrens=[left, self.sum()])
-            case Lexer.MINUS: # некоммутативная операция (1 - 2 - 3 и 1 + 1 - 1 + 1)
+            case Lexer.MINUS: # noncommutative operation (1 - 2 - 3 и 1 + 1 - 1 + 1)
                 while self.lex.state in [Lexer.MINUS, Lexer.PLUS]:
                     if self.lex.state == Lexer.MINUS:
                         self.lex.get_next_token()
@@ -137,7 +137,7 @@ class Parser:
             case Lexer.MULTIPLY:
                 self.lex.get_next_token()
                 return Node(Parser.MUL, childrens=[left, self.product()])
-            case (Lexer.DIVISION | Lexer.REMAINDER): # некоммутативные операции с одинаковым приоритетом
+            case (Lexer.DIVISION | Lexer.REMAINDER): # noncommutative operation with same priority
                 while self.lex.state in [Lexer.DIVISION, Lexer.MULTIPLY, Lexer.REMAINDER]:
                     match self.lex.state:
                         case Lexer.DIVISION:
@@ -190,7 +190,7 @@ class Parser:
             parameters = []
             self.lex.get_next_token()
             while self.lex.state == Lexer.IDENTIFIER:
-                parameters += [Node(Parser.VARIABLE, self.lex.value)]
+                parameters += [Node(Parser.IDENTIFIER, self.lex.value)]
                 self.lex.get_next_token()
                 if self.lex.state == Lexer.COMMA:
                     self.lex.get_next_token()
@@ -266,7 +266,7 @@ class Parser:
             case Lexer.FOR:
                 self.lex.get_next_token()
                 if self.lex.state == Lexer.IDENTIFIER:
-                    identifier = Node(Parser.VARIABLE, self.lex.value)
+                    identifier = Node(Parser.IDENTIFIER, self.lex.value)
                     self.lex.get_next_token()
                     if self.lex.state == Lexer.IN:
                         self.lex.get_next_token()
@@ -288,7 +288,7 @@ class Parser:
             case Lexer.DEF:
                 self.lex.get_next_token()
                 if self.lex.state == Lexer.IDENTIFIER:
-                    identifier = Node(Parser.VARIABLE, self.lex.value)
+                    identifier = Node(Parser.IDENTIFIER, self.lex.value)
                     self.lex.get_next_token()
                     formalparameters = self.formalparameters()
                     if self.lex.state == Lexer.COLON:
@@ -302,9 +302,9 @@ class Parser:
                         self.error("Expected ':'")
                 else:
                     self.error("Expected function identifier")
-            # MODIFICATION (ID = FORMULA)
+            # MODIFICATION (ID = FORMULA) | FUCTION CALL (ID(FACTPARAMETERS))
             case Lexer.IDENTIFIER:
-                identifier = Node(Parser.VARIABLE, self.lex.value)
+                identifier = Node(Parser.IDENTIFIER, self.lex.value)
                 self.lex.get_next_token()
                 if self.lex.state == Lexer.SET:
                     self.lex.get_next_token()

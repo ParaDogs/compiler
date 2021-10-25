@@ -8,10 +8,9 @@ class Lexem:
         return f"({self.row}, {self.col})\t{Lexer.PRESENTATION[self.type]}\t{self.value}"
 
 class Lexer:
-    def __init__(self, file=sys.stdin, debug=False):
-        self.file = open(file, 'r') if file != sys.stdin else sys.stdin
+    def __init__(self, file):
+        self.file = open(file, 'r')
         self.state = None
-        self.debug = debug
 
     # types of lexemes
     INTNUMBER, FLOATNUMBER, IDENTIFIER, STRING,\
@@ -21,7 +20,6 @@ class Lexer:
     LRBRACKET, RRBRACKET, LSBRACKET, RSBRACKET,\
     TABULATION, COMMA, COLON, LESS, GREATER, QUOTE1, QUOTE2, DECIMALPOINT, NEWLINE, EOF = range(36)
 
-    # alphabet = "_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789()[]\'\""
     PRESENTATION = {
         INTNUMBER   : "integer",
         FLOATNUMBER : "float",
@@ -123,7 +121,6 @@ class Lexer:
                 self.get_next_char()
             # end of file
             if len(self.current_char) == 0:
-                # row, col = self.row, self.col
                 self.state = Lexer.EOF
             # comment
             elif self.current_char == '#':
@@ -147,7 +144,6 @@ class Lexer:
                         self.error(f'Incorrect indent')
             # string quote1
             elif self.current_char == "'":
-                # row,col = self.row,self.col
                 self.state = Lexer.STRING
                 self.value = ""
                 self.get_next_char()
@@ -157,7 +153,6 @@ class Lexer:
                 self.get_next_char()
             # string quote2
             elif self.current_char == '"':
-                # row,col = self.row,self.col
                 self.state = Lexer.STRING
                 self.value = ""
                 self.get_next_char()
@@ -167,16 +162,11 @@ class Lexer:
                 self.get_next_char()
             # symbols
             elif self.current_char in Lexer.SYMBOLS:
-                # row,col = self.row,self.col
-                # if self.current_char == '\n':
-                #     self.row += 1
-                #     self.col = 0              
                 self.state = Lexer.SYMBOLS[self.current_char]
                 self.value = self.current_char #?
                 self.get_next_char() #?
             # numbers float and integer
             elif self.current_char.isdigit():
-                # row,col = self.row,self.col
                 number = 0
                 while self.current_char.isdigit():
                     number = number*10 + int(self.current_char)
@@ -196,7 +186,6 @@ class Lexer:
                 self.value = str(number)
             # identifiers, keywords and reserved names
             elif self.current_char.isalpha() or self.current_char == '_':
-                # row,col = self.row,self.col
                 identifier = ""
                 while self.current_char.isalpha() or self.current_char.isdigit() or self.current_char == '_':
                     identifier += self.current_char
@@ -212,7 +201,5 @@ class Lexer:
                     self.value = identifier
             else:
                 self.error(f'Unexpected symbol: {self.current_char}')
-        # return {"state" : self.state, "value" : self.value}
         lexem = Lexem(self.row, self.col, self.state, self.value)
-        if self.debug: print(lexem)
         return lexem
