@@ -348,7 +348,8 @@ class Parser:
                     self.lex.get_next_token()
                     formula = self.formula()
                     node.childrens = [identifier, formula]
-                    self.lex.get_next_token() # newline skip
+                    if self.lex.state == Lexer.NEWLINE:
+                        self.lex.get_next_token() # newline skip
             case _: # изолированных формул не будет
                 self.error(f"Unexpected syntax")
         return node
@@ -358,7 +359,7 @@ class Parser:
         zeroblocks = []
         while self.lex.state != Lexer.EOF:
             zeroblocks += [self.zeroblock()]
-            self.lex.get_next_token()
+            # self.lex.get_next_token()
         return Node(Parser.PROGRAM, childrens=zeroblocks)
 
     def parse(self):

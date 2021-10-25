@@ -129,6 +129,8 @@ class Lexer:
             elif self.current_char == '#':
                 while self.current_char not in ['\n', '']:
                     self.get_next_char()
+                if self.current_char == "\n":
+                    self.get_next_char()
             # whitespaces and tabulation
             elif self.current_char == ' ':
                 tabulation = ""
