@@ -78,35 +78,39 @@ class Parser:
             self.lex.get_next_token()
         else:
             self.error("Expected ']'")
-        # node.show()
         return node
 
     def term(self):
-        token = self.lex.state
-        value = self.lex.value
-        # self.lex.get_next_token()
-        
-        if token == Lexer.LSBRACKET:
-            return self.list()
-        if token == Lexer.IDENTIFIER:
-            return Node(Parser.VARIABLE, value, [])
-        if token == Lexer.INTNUMBER:
-            return Node(Parser.INTNUMBER, value, [])
-        if token == Lexer.FLOATNUMBER:
-            return Node(Parser.FLOATNUMBER, value, [])
-        if token == Lexer.STRING:
-            return Node(Parser.STRING, value, [])
-        if token == Lexer.LRBRACKET:
-            self.lex.get_next_token() #?
-            node = Node(Parser.FORMULA)
-            formula = self.formula()
-            node.childrens = formula.childrens # ?????
-            if self.lex.state != Lexer.RRBRACKET:
-                self.error("Expected ')'")
-            self.lex.get_next_token()
-            return node
-        else:
-            self.error(f"Unexpected symbol")
+        match self.lex.state:        
+            case Lexer.LSBRACKET:
+                return self.list()
+            case Lexer.IDENTIFIER:
+                node = Node(Parser.VARIABLE, self.lex.value, [])
+                self.lex.get_next_token()
+                return node
+            case Lexer.INTNUMBER:
+                node = Node(Parser.INTNUMBER, self.lex.value, [])
+                self.lex.get_next_token()
+                return node
+            case Lexer.FLOATNUMBER:
+                node = Node(Parser.FLOATNUMBER, self.lex.value, [])
+                self.lex.get_next_token()
+                return node
+            case Lexer.STRING:
+                node = Node(Parser.STRING, self.lex.value, [])
+                self.lex.get_next_token()
+                return node
+            case Lexer.LRBRACKET:
+                self.lex.get_next_token() #?
+                node = Node(Parser.FORMULA)
+                formula = self.formula()
+                node.childrens = formula.childrens # ?????
+                if self.lex.state != Lexer.RRBRACKET:
+                    self.error("Expected ')'")
+                self.lex.get_next_token()
+                return node
+            case _:
+                self.error(f"Unexpected symbol")
 
     def sum(self):
         # left = self.product()
@@ -126,8 +130,7 @@ class Parser:
         match self.lex.state:
             case Lexer.PLUS:
                 self.lex.get_next_token()
-                right = self.sum()
-                return Node(Parser.ADD, childrens=[left, right])
+                return Node(Parser.ADD, childrens=[left, self.sum()])
             case Lexer.MINUS: # некоммутативная операция
                 while self.lex.state == Lexer.MINUS:
                     self.lex.get_next_token()
@@ -142,19 +145,16 @@ class Parser:
         match self.lex.state:
             case Lexer.MULTIPLY:
                 self.lex.get_next_token()
-                right = self.product()
-                return Node(Parser.MUL, childrens=[left, right])
+                return Node(Parser.MUL, childrens=[left, self.product()])
             case Lexer.DIVISION: # некоммутативная операция
                 while self.lex.state == Lexer.DIVISION:
                     self.lex.get_next_token()
-                    right = self.term()
-                    left = Node(Parser.DIV, childrens=[left, right])
+                    left = Node(Parser.DIV, childrens=[left, self.term()])
                 return left
             case Lexer.REMAINDER: # некоммутативная операция
                 while self.lex.state == Lexer.REMAINDER:
                     self.lex.get_next_token()
-                    right = self.term()
-                    left = Node(Parser.REM, childrens=[left, right])
+                    left = Node(Parser.REM, childrens=[left, self.term()])
                 return left
             case _:
                 return left
@@ -171,15 +171,16 @@ class Parser:
         #     return Node(Parser.GREATER, childrens=[left, right])
         # else:
         #     return left
+        left = self.sum()
         match self.lex.state:
             case Lexer.LESS:
                 self.lex.get_next_token()
-                return Node(Parser.LESS, childrens=[self.sum(), self.formula()])
+                return Node(Parser.LESS, childrens=[left, self.formula()])
             case Lexer.GREATER:
                 self.lex.get_next_token()
-                return Node(Parser.GREATER, childrens=[self.sum(), self.formula()])
+                return Node(Parser.GREATER, childrens=[left, self.formula()])
             case _:
-                return self.sum()
+                return left
 
     def factparameters(self):
         # if self.lex.state == Lexer.LRBRACKET:

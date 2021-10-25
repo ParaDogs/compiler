@@ -121,7 +121,6 @@ class Lexer:
         while self.state == None:
             if self.current_char == None:
                 self.get_next_char()
-
             # end of file
             if len(self.current_char) == 0:
                 # row, col = self.row, self.col
