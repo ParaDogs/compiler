@@ -133,7 +133,7 @@ class Lexer:
             # whitespaces and tabulation
             elif self.current_char == ' ':
                 tabulation = ""
-                # row,col = self.row,self.col
+                row,col = self.row,self.col
                 while self.current_char == ' ':
                     tabulation += self.current_char
                     self.get_next_char()
