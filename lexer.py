@@ -10,6 +10,7 @@ class Lexem:
 class Lexer:
     def __init__(self, file=sys.stdin, debug=False):
         self.file = open(file, 'r') if file != sys.stdin else sys.stdin
+        self.state = None
         self.debug = debug
 
     # types of lexemes

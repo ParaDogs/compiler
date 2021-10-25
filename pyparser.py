@@ -27,7 +27,7 @@ class Parser:
     PROGRAM, ZEROBLOCK, LIST, STATEMENT, MODIFICATION, FORMULA, VARIABLE, FORMALPARAMETERS, FACTPARAMETERS,\
     ADD, SUB, SET, LESS, GREATER, MUL, DIV, REM,\
     IFCONSTRUCTION, ELIFCONSTRUCTION, ELSECONSTRUCTION, WHILECONSTRUCTION, FORCONSTRUCTION, DEFCONSTRUCTION, BLOCK,\
-    INTNUMBER, FLOATNUMBER, LIST, STRING = range(28)
+    INTNUMBER, FLOATNUMBER, STRING = range(27)
 
     PRESENTATION = {
         PROGRAM             : "PROGRAM",
@@ -56,15 +56,11 @@ class Parser:
         BLOCK               : "BLOCK",
         INTNUMBER           : "INTNUMBER",
         FLOATNUMBER         : "FLOATNUMBER",
-        LIST                : "LIST",
         STRING              : "STRING",
     }
 
     def __init__(self, lex=Lexer()):
         self.lex = lex
-    
-    # def __init__(self, lex):
-    #     self.lex = lex
     
     def error(self, message):
         print("Parser error:", message)
@@ -82,7 +78,7 @@ class Parser:
             self.lex.get_next_token()
         else:
             self.error("Expected ']")
-        node.show()
+        # node.show()
         return node
 
     def term(self):
@@ -101,9 +97,10 @@ class Parser:
         if token == Lexer.STRING:
             return Node(Parser.STRING, value, [])
         if token == Lexer.LRBRACKET:
+            self.lex.get_next_token() #?
             node = Node(Parser.FORMULA)
             formula = self.formula()
-            node.childrens = formula.childrens
+            node.childrens = formula.childrens # ?????
             if self.lex.state != Lexer.RRBRACKET:
                 self.error("Expected ')'")
             self.lex.get_next_token()
@@ -133,11 +130,11 @@ class Parser:
             self.lex.get_next_token()
             right = self.product()
             return Node(Parser.MUL, childrens=[left, right])
-        elif token == Lexer.DIVISION:
+        elif token == Lexer.DIVISION: # некоммутативное
             self.lex.get_next_token()
             right = self.product()
             return Node(Parser.DIV, childrens=[left, right])
-        elif token == Lexer.REMAINDER:
+        elif token == Lexer.REMAINDER: # некоммутативное
             self.lex.get_next_token()
             right = self.product()
             return Node(Parser.REM, childrens=[left, right])
@@ -212,7 +209,7 @@ class Parser:
             self.error("Expected indent")
         return node
 
-    def zeroblock(self):
+    def zeroblock(self): # TODO можно начинать с elif?
         # IF pattern
         if self.lex.state == Lexer.IF:
             node = Node(Parser.IFCONSTRUCTION)
@@ -323,8 +320,9 @@ class Parser:
                 self.lex.get_next_token()
                 formula = self.formula()
                 node.childrens = [identifier, formula]
-            else:
-                self.error(f"Unexpected symbol \"{self.lex.value}\" in {self.lex.row,self.lex.col}")
+            # else:
+            #     # a+a?
+            #     self.error(f"Unexpected symbol \"{self.lex.value}\" in {self.lex.row,self.lex.col}")
         # FORMULA
         else:
             formula = self.formula()
@@ -342,6 +340,6 @@ class Parser:
     def parse(self):
         self.lex.get_next_token()
         node = self.program()
-        if (self.lex.state != Lexer.EOF):
-            self.error("Invalid statement syntax")
+        # if (self.lex.state != Lexer.EOF):
+        #     self.error("Invalid statement syntax")
         return node
