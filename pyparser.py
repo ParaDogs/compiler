@@ -67,23 +67,23 @@ class Parser:
         sys.exit(1)
 
     def list(self):
-        node = Node(Parser.LIST)
-        # self.lex.get_next_token()
-        while self.lex.state != Lexer.RSBRACKET:
-            node.childrens += [self.formula()]
+        formulas = []
+        if self.lex.state == Lexer.LSBRACKET:
             self.lex.get_next_token()
+        while self.lex.state != Lexer.RSBRACKET:
+            formulas += [self.formula()]
             if self.lex.state == Lexer.COMMA:
                 self.lex.get_next_token()
-        if self.lex.state == Lexer.RSBRACKET:
-            self.lex.get_next_token()
-        else:
-            self.error("Expected ']'")
-        return node
+        return Node(Parser.LIST, childrens=formulas)
 
     def term(self):
         match self.lex.state:        
             case Lexer.LSBRACKET:
-                return self.list()
+                node = self.list()
+                if self.lex.state != Lexer.RSBRACKET:
+                    self.error("Expected ']'")
+                self.lex.get_next_token()
+                return node
             case Lexer.IDENTIFIER:
                 node = Node(Parser.VARIABLE, self.lex.value, [])
                 self.lex.get_next_token()
@@ -101,14 +101,12 @@ class Parser:
                 self.lex.get_next_token()
                 return node
             case Lexer.LRBRACKET:
-                self.lex.get_next_token() #?
-                node = Node(Parser.FORMULA)
+                self.lex.get_next_token()
                 formula = self.formula()
-                node.childrens = formula.childrens # ?????
                 if self.lex.state != Lexer.RRBRACKET:
                     self.error("Expected ')'")
                 self.lex.get_next_token()
-                return node
+                return formula
             case _:
                 self.error(f"Unexpected symbol")
 
@@ -118,8 +116,8 @@ class Parser:
             case Lexer.PLUS:
                 self.lex.get_next_token()
                 return Node(Parser.ADD, childrens=[left, self.sum()])
-            case Lexer.MINUS: # некоммутативная операция
-                while self.lex.state == Lexer.MINUS or self.lex.state == Lexer.PLUS:
+            case Lexer.MINUS: # некоммутативная операция (1 - 2 - 3 и 1 + 1 - 1 + 1)
+                while self.lex.state in [Lexer.MINUS, Lexer.PLUS]:
                     if self.lex.state == Lexer.MINUS:
                         self.lex.get_next_token()
                         right = self.product()
@@ -138,15 +136,21 @@ class Parser:
             case Lexer.MULTIPLY:
                 self.lex.get_next_token()
                 return Node(Parser.MUL, childrens=[left, self.product()])
-            case Lexer.DIVISION: # некоммутативная операция
-                while self.lex.state == Lexer.DIVISION:
-                    self.lex.get_next_token()
-                    left = Node(Parser.DIV, childrens=[left, self.term()])
-                return left
-            case Lexer.REMAINDER: # некоммутативная операция
-                while self.lex.state == Lexer.REMAINDER:
-                    self.lex.get_next_token()
-                    left = Node(Parser.REM, childrens=[left, self.term()])
+            case (Lexer.DIVISION | Lexer.REMAINDER): # некоммутативные операции с одинаковым приоритетом
+                while self.lex.state in [Lexer.DIVISION, Lexer.MULTIPLY, Lexer.REMAINDER]:
+                    match self.lex.state:
+                        case Lexer.DIVISION:
+                            self.lex.get_next_token()
+                            right = self.term()
+                            left = Node(Parser.DIV, childrens=[left, right])
+                        case Lexer.MULTIPLY:
+                            self.lex.get_next_token()
+                            right = self.term()
+                            left = Node(Parser.MUL, childrens=[left, right])
+                        case Lexer.REMAINDER:
+                            self.lex.get_next_token()
+                            right = self.term()
+                            left = Node(Parser.REM, childrens=[left, right])
                 return left
             case _:
                 return left
@@ -164,25 +168,9 @@ class Parser:
                 return left
 
     def factparameters(self):
-        # if self.lex.state == Lexer.LRBRACKET:
-        #     node = Node(Parser.FACTPARAMETERS)
-        #     # self.lex.get_next_token()
-        #     while self.lex.state != Lexer.RRBRACKET:
-        #         node.childrens += [self.formula()]
-        #         self.lex.get_next_token()
-        #         if self.lex.state == Lexer.COMMA:
-        #             self.lex.get_next_token()
-        #     if self.lex.state == Lexer.RRBRACKET:
-        #         self.lex.get_next_token()
-        #     else:
-        #         self.error("Expected ')'")
-        # else:
-        #     self.error("Expected '('")
-        # return node
         node = Node(Parser.FACTPARAMETERS)
         print(self.lex.value)
         while self.lex.state != Lexer.RRBRACKET: 
-            # print(self.lex.state)
             node.childrens += [self.formula()]
             self.lex.get_next_token()
             if self.lex.state == Lexer.COMMA:
@@ -216,7 +204,7 @@ class Parser:
             self.error("Expected indent")
         return Node(Parser.BLOCK, childrens=zeroblocks)
 
-    def zeroblock(self): # TODO можно начинать с elif?
+    def zeroblock(self): # TODO можно начинать с elif? (обработать или здесь или в семантическом анализаторе)
         match self.lex.state:
             # IF pattern
             case Lexer.IF:
