@@ -9,8 +9,8 @@ if __name__=='__main__':
 
     flags = argparser.parse_args()
     # BEGIN DEBUG (Can run without command line parameters)
-    # flags.mode      = "parser"
-    # flags.file      = "tests/request/def"
+    flags.mode      = "parser"
+    flags.file      = "tests/request/list-element"
     # END DEBUG
     match flags.mode:
         case "lexer":
@@ -24,6 +24,6 @@ if __name__=='__main__':
             tree = pars.parse()
             tree.show()
         case _:
-            print("Missing paramenter -m (--mode). Select compiler mode (-m parser | -m lexer)")
+            print("Wrong paramenter -m (--mode). Select compiler mode (-m parser | -m lexer)") 
     if not flags.file:
-        print("Missing paramenter -f (--file). Select input file (-f FILE)")
+        print("Wrong paramenter -f (--file). Select input file (-f FILE)")

@@ -26,7 +26,7 @@ class Parser:
     PROGRAM, LIST, STATEMENT, MODIFICATION, FORMULA, FUNCTION, IDENTIFIER, FORMALPARAMETERS, FACTPARAMETERS,\
     ADD, SUB, SET, LESS, GREATER, MUL, DIV, REM,\
     IFCONSTRUCTION, ELIFCONSTRUCTION, ELSECONSTRUCTION, WHILECONSTRUCTION, FORCONSTRUCTION, DEFCONSTRUCTION, BLOCK,\
-    INTNUMBER, FLOATNUMBER, STRING, RETURN = range(28)
+    INTNUMBER, FLOATNUMBER, STRING, RETURN, LISTELEMENT = range(29)
 
     PRESENTATION = {
         PROGRAM             : "PROGRAM",
@@ -57,6 +57,7 @@ class Parser:
         FLOATNUMBER         : "FLOATNUMBER",
         STRING              : "STRING",
         RETURN              : "RETURN",
+        LISTELEMENT         : "LISTELEMENT"
     }
 
     def __init__(self, lex):
@@ -85,9 +86,21 @@ class Parser:
                 self.lex.get_next_token()
                 return node
             case Lexer.IDENTIFIER:
-                node = Node(Parser.IDENTIFIER, self.lex.value)
+                identifier = Node(Parser.IDENTIFIER, self.lex.value)
                 self.lex.get_next_token()
-                return node
+                match self.lex.state:
+                    case Lexer.LRBRACKET: # function call
+                        factparameters = self.factparameters()
+                        return Node(Parser.FUNCTION, childrens=[identifier,factparameters])
+                    case Lexer.LSBRACKET: # list element
+                        self.lex.get_next_token()
+                        index = self.formula()
+                        if self.lex.state != Lexer.RSBRACKET:
+                            self.error("Expected ']'")
+                        self.lex.get_next_token()
+                        return Node(Parser.LISTELEMENT, childrens=[identifier,index])                            
+                    case _: # identifier
+                        return identifier
             case Lexer.INTNUMBER:
                 node = Node(Parser.INTNUMBER, self.lex.value)
                 self.lex.get_next_token()
@@ -173,16 +186,15 @@ class Parser:
             self.lex.get_next_token()
             while self.lex.state != Lexer.RRBRACKET:
                 formulas += [self.formula()]
-                self.lex.get_next_token()
                 if self.lex.state == Lexer.COMMA:
                     self.lex.get_next_token()
-                if self.lex.state in [Lexer.NEWLINE, Lexer.EOF]:
-                    self.error("Expected ')'")
             if self.lex.state == Lexer.RRBRACKET:
                 self.lex.get_next_token()
+            else:
+                self.error("Expected ')'")
         else:
             self.error("Expected '('")
-        return Node(Parser.FORMALPARAMETERS, childrens=formulas)
+        return Node(Parser.FACTPARAMETERS, childrens=formulas)
 
     def formalparameters(self):
         if self.lex.state == Lexer.LRBRACKET:
@@ -301,7 +313,7 @@ class Parser:
                         self.error("Expected ':'")
                 else:
                     self.error("Expected function identifier")
-            # MODIFICATION (ID = FORMULA) | FUCTION CALL (ID(FACTPARAMETERS))
+            # MODIFICATION (ID = FORMULA)
             case Lexer.IDENTIFIER:
                 identifier = Node(Parser.IDENTIFIER, self.lex.value)
                 self.lex.get_next_token()
@@ -310,7 +322,7 @@ class Parser:
                     formula = self.formula()
                     if self.lex.state == Lexer.NEWLINE:
                         self.lex.get_next_token() # newline skip
-                    return Node(Parser.MODIFICATION, childrens=[identifier, formula])
+                    return Node(Parser.MODIFICATION, childrens=[identifier, formula])                
             # RETURN for DEF-construction
             case Lexer.RETURN:
                 self.lex.get_next_token()
