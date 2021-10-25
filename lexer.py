@@ -105,7 +105,7 @@ class Lexer:
     row, col = 1,0
 
     def error(self, message):
-        print("Lexer error:", message)
+        print("Lexer error:", message, f"in possition {self.row,self.col}")
         sys.exit(1)
 
     def get_next_char(self):
@@ -143,7 +143,7 @@ class Lexer:
                         break
                 if len(tabulation) != 4 and len(tabulation) > 1: # if new line
                     if col == 1:
-                        self.error(f'Incorrect indent in position {row,col}')
+                        self.error(f'Incorrect indent')
             # string quote1
             elif self.current_char == "'":
                 # row,col = self.row,self.col
@@ -181,7 +181,7 @@ class Lexer:
                     number = number*10 + int(self.current_char)
                     self.get_next_char()
                 if self.current_char.isalpha() or self.current_char == "_":
-                    self.error(f'Invalid identifier in position {self.row,self.col}')
+                    self.error(f'Invalid identifier')
                 if self.current_char == '.':
                     number = str(number)
                     number += '.'
@@ -210,7 +210,7 @@ class Lexer:
                     self.state = Lexer.IDENTIFIER
                     self.value = identifier
             else:
-                self.error(f'Unexpected symbol: {self.current_char} in position {self.row,self.col}')
+                self.error(f'Unexpected symbol: {self.current_char}')
         # return {"state" : self.state, "value" : self.value}
         lexem = Lexem(self.row, self.col, self.state, self.value)
         if self.debug: print(lexem)

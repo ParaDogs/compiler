@@ -63,7 +63,7 @@ class Parser:
         self.lex = lex
     
     def error(self, message):
-        print("Parser error:", message)
+        print("Parser error:", message, f"in possition {self.lex.row,self.lex.col}")
         sys.exit(1)
 
     def list(self):
@@ -77,7 +77,7 @@ class Parser:
         if self.lex.state == Lexer.RSBRACKET:
             self.lex.get_next_token()
         else:
-            self.error("Expected ']")
+            self.error("Expected ']'")
         # node.show()
         return node
 
@@ -106,54 +106,80 @@ class Parser:
             self.lex.get_next_token()
             return node
         else:
-            self.error(f"!Unexpected symbol \"{self.lex.value}\" in {self.lex.row,self.lex.col}")
+            self.error(f"Unexpected symbol")
 
     def sum(self):
+        # left = self.product()
+        # if self.lex.state == Lexer.PLUS:
+        #     self.lex.get_next_token()
+        #     right = self.sum()
+        #     return Node(Parser.ADD, childrens=[left, right])
+        # if self.lex.state == Lexer.MINUS:
+        #     while self.lex.state == Lexer.MINUS:
+        #         self.lex.get_next_token()
+        #         right = self.product()
+        #         left = Node(Parser.SUB, childrens=[left, right])
+        #     return left
+        # else:
+        #     return left
         left = self.product()
-        if self.lex.state == Lexer.PLUS:
-            self.lex.get_next_token()
-            right = self.sum()
-            return Node(Parser.ADD, childrens=[left, right])
-        if self.lex.state == Lexer.MINUS:
-            while self.lex.state == Lexer.MINUS:
+        match self.lex.state:
+            case Lexer.PLUS:
                 self.lex.get_next_token()
-                right = self.product()
-                left = Node(Parser.SUB, childrens=[left, right])
-            return left
-        else:
-            return left
+                right = self.sum()
+                return Node(Parser.ADD, childrens=[left, right])
+            case Lexer.MINUS: # некоммутативная операция
+                while self.lex.state == Lexer.MINUS:
+                    self.lex.get_next_token()
+                    right = self.product()
+                    left = Node(Parser.SUB, childrens=[left, right])
+                return left
+            case _:
+                return left
 
     def product(self):
         left = self.term()
-        token = self.lex.state
-        if token == Lexer.MULTIPLY:
-            self.lex.get_next_token()
-            right = self.product()
-            return Node(Parser.MUL, childrens=[left, right])
-        elif token == Lexer.DIVISION: # некоммутативное
-            self.lex.get_next_token()
-            right = self.product()
-            return Node(Parser.DIV, childrens=[left, right])
-        elif token == Lexer.REMAINDER: # некоммутативное
-            self.lex.get_next_token()
-            right = self.product()
-            return Node(Parser.REM, childrens=[left, right])
-        else:
-            return left
+        match self.lex.state:
+            case Lexer.MULTIPLY:
+                self.lex.get_next_token()
+                right = self.product()
+                return Node(Parser.MUL, childrens=[left, right])
+            case Lexer.DIVISION: # некоммутативная операция
+                while self.lex.state == Lexer.DIVISION:
+                    self.lex.get_next_token()
+                    right = self.term()
+                    left = Node(Parser.DIV, childrens=[left, right])
+                return left
+            case Lexer.REMAINDER: # некоммутативная операция
+                while self.lex.state == Lexer.REMAINDER:
+                    self.lex.get_next_token()
+                    right = self.term()
+                    left = Node(Parser.REM, childrens=[left, right])
+                return left
+            case _:
+                return left
 
     def formula(self):
-        left = self.sum()
-        token = self.lex.state
-        if token == Lexer.LESS:
-            self.lex.get_next_token()
-            right = self.formula()
-            return Node(Parser.LESS, childrens=[left, right])
-        elif token == Lexer.GREATER:
-            self.lex.get_next_token()
-            right = self.formula()
-            return Node(Parser.GREATER, childrens=[left, right])
-        else:
-            return left
+        # left = self.sum()
+        # if self.lex.state == Lexer.LESS:
+        #     self.lex.get_next_token()
+        #     right = self.formula()
+        #     return Node(Parser.LESS, childrens=[left, right])
+        # elif self.lex.state == Lexer.GREATER:
+        #     self.lex.get_next_token()
+        #     right = self.formula()
+        #     return Node(Parser.GREATER, childrens=[left, right])
+        # else:
+        #     return left
+        match self.lex.state:
+            case Lexer.LESS:
+                self.lex.get_next_token()
+                return Node(Parser.LESS, childrens=[self.sum(), self.formula()])
+            case Lexer.GREATER:
+                self.lex.get_next_token()
+                return Node(Parser.GREATER, childrens=[self.sum(), self.formula()])
+            case _:
+                return self.sum()
 
     def factparameters(self):
         # if self.lex.state == Lexer.LRBRACKET:
@@ -210,95 +236,38 @@ class Parser:
         return node
 
     def zeroblock(self): # TODO можно начинать с elif?
-        # IF pattern
-        if self.lex.state == Lexer.IF:
-            node = Node(Parser.IFCONSTRUCTION)
-            self.lex.get_next_token()
-            statement = self.formula()
-            if self.lex.state == Lexer.COLON:
+        match self.lex.state:
+            # IF pattern
+            case Lexer.IF:
+                node = Node(Parser.IFCONSTRUCTION)
                 self.lex.get_next_token()
-                if self.lex.state == Lexer.NEWLINE:
-                    block = self.block()
-                else:
-                    self.error("Expected new line")
-            else:
-                self.error("Expected ':'")
-            node.childrens = [statement, block]
-        # ELIF pattern
-        elif self.lex.state == Lexer.ELIF:
-            node = Node(Parser.ELIFCONSTRUCTION)
-            self.lex.get_next_token()
-            statement = self.formula()
-            if self.lex.state == Lexer.COLON:
-                self.lex.get_next_token()
-                if self.lex.state == Lexer.NEWLINE:
-                    block = self.block()
-                else:
-                    self.error("Expected new line")
-            else:
-                self.error("Expected ':'")
-            node.childrens = [statement, block]
-        # ELSE pattern
-        elif self.lex.state == Lexer.ELSE:
-            node = Node(Parser.ELSECONSTRUCTION)
-            self.lex.get_next_token()
-            if self.lex.state == Lexer.COLON:
-                self.lex.get_next_token()
-                if self.lex.state == Lexer.NEWLINE:
-                    block = self.block()
-                else:
-                    self.error("Expected new line")
-            else:
-                self.error("Expected ':'")
-            node.childrens = [block]
-        # WHILE pattern
-        elif self.lex.state == Lexer.WHILE:
-            node = Node(Parser.WHILECONSTRUCTION)
-            self.lex.get_next_token()
-            statement = self.formula()
-            self.lex.get_next_token()
-            if self.lex.state == Lexer.COLON:
-                self.lex.get_next_token()
-                if self.lex.state == Lexer.NEWLINE:
-                    block = self.block()
-                else:
-                    self.error("Expected new line")
-            else:
-                self.error("Expected ':'")
-            node.childrens = [statement, block]
-        # FOR construction
-        elif self.lex.state == Lexer.FOR:
-            node = Node(Parser.FORCONSTRUCTION)
-            self.lex.get_next_token()
-            if self.lex.state == Lexer.IDENTIFIER:
-                identifier = Node(Parser.VARIABLE, self.lex.value, [])
-                self.lex.get_next_token()
-                if self.lex.state == Lexer.IN:
+                statement = self.formula()
+                if self.lex.state == Lexer.COLON:
                     self.lex.get_next_token()
-                    formula = self.formula()
-                    self.lex.get_next_token()
-                    if self.lex.state == Lexer.COLON:
-                        self.lex.get_next_token()
-                        if self.lex.state == Lexer.NEWLINE:
-                            self.lex.get_next_token()
-                            block = self.block()
-                        else:
-                            self.error("Expected new line")
+                    if self.lex.state == Lexer.NEWLINE:
+                        block = self.block()
                     else:
-                        self.error("Expected ':'")
+                        self.error("Expected new line")
                 else:
-                    self.error("Expected 'in'")
-            else:
-                self.error("Expected identifier")
-            node.childrens = [identifier, formula, block]
-        # DEF construction
-        elif self.lex.state == Lexer.DEF:
-            node = Node(Parser.DEFCONSTRUCTION)
-            self.lex.get_next_token()
-            if self.lex.state == Lexer.IDENTIFIER:
-                identifier = self.lex.value
+                    self.error("Expected ':'")
+                node.childrens = [statement, block]
+            # ELIF pattern
+            case Lexer.ELIF:
+                node = Node(Parser.ELIFCONSTRUCTION)
                 self.lex.get_next_token()
-                formalparameters = self.formalparameters()
+                statement = self.formula()
+                if self.lex.state == Lexer.COLON:
+                    self.lex.get_next_token()
+                    if self.lex.state == Lexer.NEWLINE:
+                        block = self.block()
+                    else:
+                        self.error("Expected new line")
+                else:
+                    self.error("Expected ':'")
+                node.childrens = [statement, block]
+            # ELSE pattern
+            case Lexer.ELSE:
+                node = Node(Parser.ELSECONSTRUCTION)
                 self.lex.get_next_token()
                 if self.lex.state == Lexer.COLON:
                     self.lex.get_next_token()
@@ -308,26 +277,79 @@ class Parser:
                         self.error("Expected new line")
                 else:
                     self.error("Expected ':'")
-            else:
-                self.error("Expected function identifier")
-            node.childrens = [identifier, formalparameters, block]
-        # MODIFICATION
-        elif self.lex.state == Lexer.IDENTIFIER:
-            identifier = Node(Parser.VARIABLE, self.lex.value, [])
-            self.lex.get_next_token()
-            if self.lex.state == Lexer.SET:
-                node = Node(Parser.MODIFICATION, self.lex.value)
+                node.childrens = [block]
+            # WHILE pattern
+            case Lexer.WHILE:
+                node = Node(Parser.WHILECONSTRUCTION)
                 self.lex.get_next_token()
-                formula = self.formula()
-                node.childrens = [identifier, formula]
-                self.lex.get_next_token() # newline skip
-            # else:
-            #     # a+a?
-            #     self.error(f"Unexpected symbol \"{self.lex.value}\" in {self.lex.row,self.lex.col}")
-        # FORMULA
-        else:
-            formula = self.formula()
-            node = formula
+                statement = self.formula()
+                self.lex.get_next_token()
+                if self.lex.state == Lexer.COLON:
+                    self.lex.get_next_token()
+                    if self.lex.state == Lexer.NEWLINE:
+                        block = self.block()
+                    else:
+                        self.error("Expected new line")
+                else:
+                    self.error("Expected ':'")
+                node.childrens = [statement, block]
+            # FOR construction
+            case Lexer.FOR:
+                node = Node(Parser.FORCONSTRUCTION)
+                self.lex.get_next_token()
+                if self.lex.state == Lexer.IDENTIFIER:
+                    identifier = Node(Parser.VARIABLE, self.lex.value, [])
+                    self.lex.get_next_token()
+                    if self.lex.state == Lexer.IN:
+                        self.lex.get_next_token()
+                        formula = self.formula()
+                        self.lex.get_next_token()
+                        if self.lex.state == Lexer.COLON:
+                            self.lex.get_next_token()
+                            if self.lex.state == Lexer.NEWLINE:
+                                self.lex.get_next_token()
+                                block = self.block()
+                            else:
+                                self.error("Expected new line")
+                        else:
+                            self.error("Expected ':'")
+                    else:
+                        self.error("Expected 'in'")
+                else:
+                    self.error("Expected identifier")
+                node.childrens = [identifier, formula, block]
+            # DEF construction (def ID in FORMULA: \n BLOCK)
+            case Lexer.DEF:
+                node = Node(Parser.DEFCONSTRUCTION)
+                self.lex.get_next_token()
+                if self.lex.state == Lexer.IDENTIFIER:
+                    identifier = self.lex.value
+                    self.lex.get_next_token()
+                    formalparameters = self.formalparameters()
+                    self.lex.get_next_token()
+                    if self.lex.state == Lexer.COLON:
+                        self.lex.get_next_token()
+                        if self.lex.state == Lexer.NEWLINE:
+                            block = self.block()
+                        else:
+                            self.error("Expected new line")
+                    else:
+                        self.error("Expected ':'")
+                else:
+                    self.error("Expected function identifier")
+                node.childrens = [identifier, formalparameters, block]
+            # MODIFICATION (ID = FORMULA)
+            case Lexer.IDENTIFIER:
+                identifier = Node(Parser.VARIABLE, self.lex.value, [])
+                self.lex.get_next_token()
+                if self.lex.state == Lexer.SET:
+                    node = Node(Parser.MODIFICATION, self.lex.value)
+                    self.lex.get_next_token()
+                    formula = self.formula()
+                    node.childrens = [identifier, formula]
+                    self.lex.get_next_token() # newline skip
+            case _: # изолированных формул не будет
+                self.error(f"Unexpected syntax")
         return node
 
     # program is zeroblocks (instructions) list
