@@ -1,0 +1,59 @@
+PROGRAM
+|+-MODIFICATION
+|   |+-IDENTIFIER : f
+|   |+-SUB
+|   |   |+-INTNUMBER : 1
+|   |   |+-ADD
+|   |   |   |+-INTNUMBER : 2
+|   |   |   |+-INTNUMBER : 2
+|+-MODIFICATION
+|   |+-IDENTIFIER : a
+|   |+-SUB
+|   |   |+-SUB
+|   |   |   |+-INTNUMBER : 1
+|   |   |   |+-INTNUMBER : 2
+|   |   |+-INTNUMBER : 3
+|+-MODIFICATION
+|   |+-IDENTIFIER : d
+|   |+-ADD
+|   |   |+-INTNUMBER : 1
+|   |   |+-ADD
+|   |   |   |+-SUB
+|   |   |   |   |+-DIV
+|   |   |   |   |   |+-INTNUMBER : 6
+|   |   |   |   |   |+-IDENTIFIER : ad
+|   |   |   |   |+-MUL
+|   |   |   |   |   |+-IDENTIFIER : ad
+|   |   |   |   |   |+-IDENTIFIER : ed
+|   |   |   |+-INTNUMBER : 4
+|+-MODIFICATION
+|   |+-IDENTIFIER : e
+|   |+-ADD
+|   |   |+-INTNUMBER : 1
+|   |   |+-ADD
+|   |   |   |+-SUB
+|   |   |   |   |+-INTNUMBER : 1
+|   |   |   |   |+-INTNUMBER : 1
+|   |   |   |+-INTNUMBER : 1
+|+-MODIFICATION
+|   |+-IDENTIFIER : h
+|   |+-MUL
+|   |   |+-IDENTIFIER : a
+|   |   |+-MUL
+|   |   |   |+-DIV
+|   |   |   |   |+-IDENTIFIER : b
+|   |   |   |   |+-IDENTIFIER : a
+|   |   |   |+-IDENTIFIER : c
+|+-MODIFICATION
+|   |+-IDENTIFIER : h
+|   |+-MUL
+|   |   |+-IDENTIFIER : a
+|   |   |+-DIV
+|   |   |   |+-REM
+|   |   |   |   |+-REM
+|   |   |   |   |   |+-DIV
+|   |   |   |   |   |   |+-IDENTIFIER : b
+|   |   |   |   |   |   |+-IDENTIFIER : a
+|   |   |   |   |   |+-INTNUMBER : 3
+|   |   |   |   |+-INTNUMBER : 3
+|   |   |   |+-INTNUMBER : 2

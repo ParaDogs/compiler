@@ -12,7 +12,6 @@ if __name__=='__main__':
     # flags.mode      = "parser"
     # flags.file      = "tests/request/def"
     # END DEBUG
-    
     match flags.mode:
         case "lexer":
             lex = Lexer(flags.file)
@@ -24,3 +23,7 @@ if __name__=='__main__':
             pars = Parser(Lexer(flags.file))
             tree = pars.parse()
             tree.show()
+        case _:
+            print("Missing paramenter -m (--mode). Select compiler mode (-m parser | -m lexer)")
+    if not flags.file:
+        print("Missing paramenter -f (--file). Select input file (-f FILE)")
