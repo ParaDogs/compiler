@@ -86,19 +86,19 @@ class Parser:
                 self.lex.get_next_token()
                 return node
             case Lexer.IDENTIFIER:
-                node = Node(Parser.VARIABLE, self.lex.value, [])
+                node = Node(Parser.VARIABLE, self.lex.value)
                 self.lex.get_next_token()
                 return node
             case Lexer.INTNUMBER:
-                node = Node(Parser.INTNUMBER, self.lex.value, [])
+                node = Node(Parser.INTNUMBER, self.lex.value)
                 self.lex.get_next_token()
                 return node
             case Lexer.FLOATNUMBER:
-                node = Node(Parser.FLOATNUMBER, self.lex.value, [])
+                node = Node(Parser.FLOATNUMBER, self.lex.value)
                 self.lex.get_next_token()
                 return node
             case Lexer.STRING:
-                node = Node(Parser.STRING, self.lex.value, [])
+                node = Node(Parser.STRING, self.lex.value)
                 self.lex.get_next_token()
                 return node
             case Lexer.LRBRACKET:
@@ -266,7 +266,7 @@ class Parser:
             case Lexer.FOR:
                 self.lex.get_next_token()
                 if self.lex.state == Lexer.IDENTIFIER:
-                    identifier = Node(Parser.VARIABLE, self.lex.value, [])
+                    identifier = Node(Parser.VARIABLE, self.lex.value)
                     self.lex.get_next_token()
                     if self.lex.state == Lexer.IN:
                         self.lex.get_next_token()
@@ -288,7 +288,7 @@ class Parser:
             case Lexer.DEF:
                 self.lex.get_next_token()
                 if self.lex.state == Lexer.IDENTIFIER:
-                    identifier = Node(Parser.VARIABLE, self.lex.value, [])
+                    identifier = Node(Parser.VARIABLE, self.lex.value)
                     self.lex.get_next_token()
                     formalparameters = self.formalparameters()
                     if self.lex.state == Lexer.COLON:
@@ -304,7 +304,7 @@ class Parser:
                     self.error("Expected function identifier")
             # MODIFICATION (ID = FORMULA)
             case Lexer.IDENTIFIER:
-                identifier = Node(Parser.VARIABLE, self.lex.value, [])
+                identifier = Node(Parser.VARIABLE, self.lex.value)
                 self.lex.get_next_token()
                 if self.lex.state == Lexer.SET:
                     self.lex.get_next_token()
