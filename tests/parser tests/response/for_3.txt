@@ -1,0 +1,12 @@
+PROGRAM
+|+-FORCONSTRUCTION
+|   |+-IDENTIFIER : c
+|   |+-IDENTIFIER : d
+|   |+-BLOCK
+|   |   |+-FORCONSTRUCTION
+|   |   |   |+-IDENTIFIER : e
+|   |   |   |+-IDENTIFIER : f
+|   |   |   |+-BLOCK
+|   |   |   |   |+-MODIFICATION
+|   |   |   |   |   |+-IDENTIFIER : c
+|   |   |   |   |   |+-INTNUMBER : 1

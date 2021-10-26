@@ -1,0 +1,14 @@
+PROGRAM
+|+-MODIFICATION
+|   |+-IDENTIFIER : h
+|   |+-MUL
+|   |   |+-IDENTIFIER : a
+|   |   |+-DIV
+|   |   |   |+-REM
+|   |   |   |   |+-REM
+|   |   |   |   |   |+-DIV
+|   |   |   |   |   |   |+-IDENTIFIER : b
+|   |   |   |   |   |   |+-IDENTIFIER : a
+|   |   |   |   |   |+-INTNUMBER : 3
+|   |   |   |   |+-INTNUMBER : 3
+|   |   |   |+-INTNUMBER : 2

@@ -1,0 +1,14 @@
+PROGRAM
+|+-MODIFICATION
+|   |+-IDENTIFIER : d
+|   |+-ADD
+|   |   |+-INTNUMBER : 1
+|   |   |+-ADD
+|   |   |   |+-SUB
+|   |   |   |   |+-DIV
+|   |   |   |   |   |+-INTNUMBER : 6
+|   |   |   |   |   |+-IDENTIFIER : ad
+|   |   |   |   |+-MUL
+|   |   |   |   |   |+-IDENTIFIER : ad
+|   |   |   |   |   |+-IDENTIFIER : ed
+|   |   |   |+-INTNUMBER : 4

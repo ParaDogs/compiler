@@ -1,0 +1,10 @@
+PROGRAM
+|+-MODIFICATION
+|   |+-IDENTIFIER : h
+|   |+-MUL
+|   |   |+-IDENTIFIER : a
+|   |   |+-MUL
+|   |   |   |+-DIV
+|   |   |   |   |+-IDENTIFIER : b
+|   |   |   |   |+-IDENTIFIER : a
+|   |   |   |+-IDENTIFIER : c

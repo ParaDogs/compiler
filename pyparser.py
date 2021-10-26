@@ -20,6 +20,28 @@ class Node:
                     children.show(level+1)
                 else:
                     children.show(level)
+
+    def show_str(self, level=0):
+        str = ""
+        if self.value != None:
+            str += f"{Parser.PRESENTATION[self.pattern]} : {self.value}" + "\n"
+        else:
+            str += f"{Parser.PRESENTATION[self.pattern]}" + "\n"
+        if self.childrens != []:
+            for children in self.childrens:
+                str += '|   '*level
+                str += "|+-"
+                if children.childrens != []:
+                    str += children.show_str(level+1)
+                else:
+                    str += children.show_str(level)
+        return str
+
+    def __repr__(self):
+        return self.show_str()
+
+    def __str__(self):
+        return self.show_str()
             
 class Parser:
     # patterns

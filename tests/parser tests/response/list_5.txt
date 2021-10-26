@@ -1,0 +1,5 @@
+PROGRAM
+|+-MODIFICATION
+|   |+-IDENTIFIER : a
+|   |+-LIST
+|   |   |+-LIST

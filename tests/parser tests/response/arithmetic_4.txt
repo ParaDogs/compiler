@@ -1,0 +1,10 @@
+PROGRAM
+|+-MODIFICATION
+|   |+-IDENTIFIER : e
+|   |+-ADD
+|   |   |+-INTNUMBER : 1
+|   |   |+-ADD
+|   |   |   |+-SUB
+|   |   |   |   |+-INTNUMBER : 1
+|   |   |   |   |+-INTNUMBER : 1
+|   |   |   |+-INTNUMBER : 1

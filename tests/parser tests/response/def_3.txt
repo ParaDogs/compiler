@@ -1,0 +1,11 @@
+PROGRAM
+|+-DEFCONSTRUCTION
+|   |+-IDENTIFIER : asdf
+|   |+-FORMALPARAMETERS
+|   |+-BLOCK
+|   |   |+-MODIFICATION
+|   |   |   |+-IDENTIFIER : a
+|   |   |   |+-INTNUMBER : 3
+|   |   |+-MODIFICATION
+|   |   |   |+-IDENTIFIER : b
+|   |   |   |+-INTNUMBER : 4

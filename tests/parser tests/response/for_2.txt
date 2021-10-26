@@ -1,0 +1,11 @@
+PROGRAM
+|+-FORCONSTRUCTION
+|   |+-IDENTIFIER : c
+|   |+-IDENTIFIER : d
+|   |+-BLOCK
+|   |   |+-MODIFICATION
+|   |   |   |+-IDENTIFIER : h
+|   |   |   |+-INTNUMBER : 1
+|   |   |+-MODIFICATION
+|   |   |   |+-IDENTIFIER : k
+|   |   |   |+-INTNUMBER : 2

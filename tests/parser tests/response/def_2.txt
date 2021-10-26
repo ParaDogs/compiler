@@ -1,0 +1,16 @@
+PROGRAM
+|+-DEFCONSTRUCTION
+|   |+-IDENTIFIER : asdf
+|   |+-FORMALPARAMETERS
+|   |   |+-IDENTIFIER : x
+|   |   |+-IDENTIFIER : da
+|   |   |+-IDENTIFIER : dsds
+|   |+-BLOCK
+|   |   |+-MODIFICATION
+|   |   |   |+-IDENTIFIER : a
+|   |   |   |+-INTNUMBER : 3
+|   |   |+-MODIFICATION
+|   |   |   |+-IDENTIFIER : asd
+|   |   |   |+-ADD
+|   |   |   |   |+-IDENTIFIER : da
+|   |   |   |   |+-IDENTIFIER : x
