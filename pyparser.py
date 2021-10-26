@@ -260,7 +260,7 @@ class Parser:
                         self.error("Expected new line")
                 else:
                     self.error("Expected ':'")
-            # WHILE pattern (def ID(FORMALPARAMETERS): \n BLOCK)
+            # WHILE pattern (while FORMULA: \n BLOCK)
             case Lexer.WHILE:
                 self.lex.get_next_token()
                 statement = self.formula()
@@ -295,7 +295,7 @@ class Parser:
                         self.error("Expected 'in'")
                 else:
                     self.error("Expected identifier")
-            # DEF construction (def ID(FORMALPARAMETERS): \n BLOCK)
+            # DEF pattern (def ID(FORMALPARAMETERS): \n BLOCK)
             case Lexer.DEF:
                 self.lex.get_next_token()
                 if self.lex.state == Lexer.IDENTIFIER:

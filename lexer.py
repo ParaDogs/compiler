@@ -6,6 +6,9 @@ class Lexem:
     
     def __repr__(self):
         return f"({self.row}, {self.col})\t{Lexer.PRESENTATION[self.type]}\t{self.value}"
+    
+    def __str__(self):
+        return f"({self.row}, {self.col})\t{Lexer.PRESENTATION[self.type]}\t{self.value}"
 
 class Lexer:
     def __init__(self, file):

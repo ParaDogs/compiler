@@ -1,0 +1,5 @@
+(1, 2)	id	a
+(1, 4)	set	=
+(1, 6)	lsbrack	[
+(1, 7)	rsbrack	]
+(1, 7)	EOF	None

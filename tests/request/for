@@ -1,6 +1,0 @@
-for a in b:
-    g = 3
-
-for c in d:
-    h = 1
-    k = 2

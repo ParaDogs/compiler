@@ -9,8 +9,8 @@ if __name__=='__main__':
 
     flags = argparser.parse_args()
     # BEGIN DEBUG (Can run without command line parameters)
-    flags.mode      = "parser"
-    flags.file      = "tests/request/list-element"
+    # flags.mode      = "parser"
+    # flags.file      = "tests/request/list-element"
     # END DEBUG
     match flags.mode:
         case "lexer":
