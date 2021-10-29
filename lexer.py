@@ -80,6 +80,7 @@ class Lexer:
         'False'     : FALSE, 
     }
 
+    n_tabs = 4
     SYMBOLS = {
         '='         : SET,
         '+'         : PLUS,
@@ -91,7 +92,8 @@ class Lexer:
         ')'         : RRBRACKET,
         '['         : LSBRACKET,
         ']'         : RSBRACKET,
-        '    '      : TABULATION,
+        '\t'        : TABULATION,
+        ' '*n_tabs  : TABULATION,
         ','         : COMMA,
         ':'         : COLON,
         '<'         : LESS,
@@ -132,19 +134,24 @@ class Lexer:
                 if self.current_char == "\n":
                     self.get_next_char()
             # whitespaces and tabulation
-            elif self.current_char == ' ':
-                tabulation = ""
-                row,col = self.row,self.col
-                while self.current_char == ' ':
-                    tabulation += self.current_char
-                    self.get_next_char()
-                    if len(tabulation) == 4 and col == 1: # if new line
-                        self.state = Lexer.SYMBOLS[tabulation]
-                        self.value = tabulation
-                        break
-                if len(tabulation) != 4 and len(tabulation) > 1: # if new line
-                    if col == 1:
-                        self.error(f'Incorrect indent')
+            elif self.current_char in [' ', '\t']:
+                match self.current_char:
+                    case '\t':
+                        self.state = Lexer.SYMBOLS[self.current_char]
+                        self.value = self.current_char
+                        self.get_next_char()
+                    case ' ':
+                        tabulation = ""
+                        col = self.col
+                        while self.current_char == ' ':
+                            tabulation += self.current_char
+                            self.get_next_char()
+                            if len(tabulation) == self.n_tabs and col == 1: # if new line
+                                self.state = Lexer.SYMBOLS[tabulation]
+                                self.value = tabulation
+                        if len(tabulation) != self.n_tabs and len(tabulation) > 1: # if new line
+                            if col == 1:
+                                self.error(f'Incorrect indent')
             # string quote1
             elif self.current_char == "'":
                 self.state = Lexer.STRING

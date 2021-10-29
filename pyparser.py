@@ -286,10 +286,10 @@ class Parser:
             case Lexer.WHILE:
                 self.lex.get_next_token()
                 statement = self.formula()
-                self.lex.get_next_token()
                 if self.lex.state == Lexer.COLON:
                     self.lex.get_next_token()
                     if self.lex.state == Lexer.NEWLINE:
+                        self.lex.get_next_token()
                         return Node(Parser.WHILECONSTRUCTION, childrens=[statement, self.block()])
                     else:
                         self.error("Expected new line")

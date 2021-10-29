@@ -1,7 +1,0 @@
-(1, 2)	id	a
-(1, 4)	set	=
-(1, 6)	lsbrack	[
-(1, 7)	lsbrack	[
-(1, 8)	rsbrack	]
-(1, 9)	rsbrack	]
-(1, 9)	EOF	None

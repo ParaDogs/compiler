@@ -1,8 +1,0 @@
-PROGRAM
-|+-DEFCONSTRUCTION
-|   |+-IDENTIFIER : f
-|   |+-FORMALPARAMETERS
-|   |+-BLOCK
-|   |   |+-MODIFICATION
-|   |   |   |+-IDENTIFIER : a
-|   |   |   |+-INTNUMBER : 1

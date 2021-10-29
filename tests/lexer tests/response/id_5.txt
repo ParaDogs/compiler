@@ -1,4 +1,0 @@
-(1, 4)	id	a4g
-(1, 6)	set	=
-(1, 8)	integer	1
-(1, 8)	EOF	None

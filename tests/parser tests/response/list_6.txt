@@ -1,6 +1,0 @@
-PROGRAM
-|+-MODIFICATION
-|   |+-IDENTIFIER : a
-|   |+-LIST
-|   |   |+-INTNUMBER : 1
-|   |   |+-LIST

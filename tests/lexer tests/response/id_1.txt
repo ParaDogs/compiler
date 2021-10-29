@@ -1,4 +1,0 @@
-(1, 6)	id	sadsd
-(1, 8)	set	=
-(1, 10)	integer	1
-(1, 10)	EOF	None

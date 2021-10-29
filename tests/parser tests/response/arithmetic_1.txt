@@ -1,8 +1,0 @@
-PROGRAM
-|+-MODIFICATION
-|   |+-IDENTIFIER : f
-|   |+-SUB
-|   |   |+-INTNUMBER : 1
-|   |   |+-ADD
-|   |   |   |+-INTNUMBER : 2
-|   |   |   |+-INTNUMBER : 2

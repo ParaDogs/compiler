@@ -1,8 +1,0 @@
-PROGRAM
-|+-FORCONSTRUCTION
-|   |+-IDENTIFIER : a
-|   |+-IDENTIFIER : b
-|   |+-BLOCK
-|   |   |+-MODIFICATION
-|   |   |   |+-IDENTIFIER : g
-|   |   |   |+-INTNUMBER : 3

@@ -1,8 +1,0 @@
-PROGRAM
-|+-MODIFICATION
-|   |+-IDENTIFIER : a
-|   |+-LIST
-|   |   |+-IDENTIFIER : a
-|   |   |+-IDENTIFIER : b
-|   |   |+-IDENTIFIER : c
-|   |   |+-IDENTIFIER : d

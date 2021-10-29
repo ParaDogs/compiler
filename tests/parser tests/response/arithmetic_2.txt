@@ -1,8 +1,0 @@
-PROGRAM
-|+-MODIFICATION
-|   |+-IDENTIFIER : a
-|   |+-SUB
-|   |   |+-SUB
-|   |   |   |+-INTNUMBER : 1
-|   |   |   |+-INTNUMBER : 2
-|   |   |+-INTNUMBER : 3
